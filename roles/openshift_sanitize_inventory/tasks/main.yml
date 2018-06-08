@@ -19,14 +19,14 @@
     openshift_release: "{{ openshift_release | string | regex_replace('^v', '') }}"
   when: openshift_release is defined
 
-- name: Abort when openshift_release is invalid
-  when:
-    - openshift_release is defined
-    - not (openshift_release is match('^\d+(\.\d+){1,3}$'))
-  fail:
-    msg: |-
-      openshift_release is "{{ openshift_release }}" which is not a valid version string.
-      Please set it to a version string like "3.4".
+#- name: Abort when openshift_release is invalid
+#  when:
+#    - openshift_release is defined
+#    - not (openshift_release is match('^\d+(\.\d+){1,3}$'))
+#  fail:
+#    msg: |-
+#      openshift_release is "{{ openshift_release }}" which is not a valid version string.
+#      Please set it to a version string like "3.4".
 
 - include_tasks: unsupported.yml
   when:

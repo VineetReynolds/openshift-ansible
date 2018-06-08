@@ -335,6 +335,10 @@
     failed_when: false
     changed_when: false
 
+  - name: Unmount volume before removing
+    command: umount /var/lib/docker
+    when: docker_vg_name.rc == 0
+
   - name: Wipe out Docker storage contents
     command: vgremove -f {{ item }}
     with_items: "{{ docker_vg_name.stdout_lines }}"
