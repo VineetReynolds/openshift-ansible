@@ -1,0 +1,43 @@
+---
+# tasks file for localflexvolume
+- name: Check if /dev/xvdd exists in list of devices
+  shell: /bin/lsblk --list --noheadings --paths --output NAME --exclude 2 | grep /dev/xvdd | wc -l
+  register: device_list
+
+- debug:
+    var: device_list
+
+- name: Set device presence
+  set_fact:
+    device_is_present: "{{ device_list.stdout == '1' }}"
+
+- debug:
+    msg: "Device is present: {{ device_is_present }}"
+
+- name: Install jq package
+  package:
+    name: jq
+    state: present
+  register: result
+  until: result is succeeded
+  when: device_is_present == true
+
+- name: Ensure mount directory exists
+  file:
+    path: /opt/ebsvol
+    state: directory
+  when: device_is_present == true
+
+- name: Create a ext4 filesystem on the device
+  filesystem:
+    fstype: ext4
+    dev: /dev/xvdd
+  when: device_is_present == true
+
+- name: Mount the device
+  mount:
+    name: /opt/ebsvol
+    src: /dev/xvdd
+    fstype: ext4
+    state: mounted
+  when: device_is_present == true
